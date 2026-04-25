@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienestar Socioemocional - Guacara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --azul-medianoche: #0D2A47;
+            --naranja-vibrante: #EB7524;
+            --azul-cielo-transparente: rgba(135, 206, 235, 0.4);
+            --naranja-suave-transparente: rgba(235, 117, 36, 0.3);
+        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--azul-medianoche); }
+        
+        /* Contenedor del Logo Especial */
+        .contenedor-logo {
+            width: 100%;
+            max-width: 500px; /* Amplitud significativa solicitada */
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .logo-especial {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            /* Filtro para resaltar el dorado sobre el azul */
+            filter: drop-shadow(0px 0px 20px rgba(235, 117, 36, 0.3));
+        }
+
+        .bg-pregunta-par { background-color: var(--azul-cielo-transparente); }
+        .bg-pregunta-impar { background-color: var(--naranja-suave-transparente); }
+        
+        .btn-naranja {
+            background-color: var(--naranja-vibrante);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(235, 117, 36, 0.4);
+        }
+        .btn-naranja:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--naranja-vibrante);
+        }
+
+        .radio-btn:checked + label {
+            background-color: var(--naranja-vibrante);
+            color: white;
+            border-color: var(--naranja-vibrante);
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div id="splash" class="flex flex-col items-center justify-center text-center w-full max-w-2xl mx-auto">
+        <div class="contenedor-logo">
+            <img src="logo.jpg" alt="Guacara Logo" class="logo-especial">
+        </div>
+        
+        <h2 class="text-3xl font-bold text-[#EB7524] mb-2 px-4 leading-tight uppercase tracking-tight">
+            Transformando Silencios en Esperanzas
+        </h2>
+        <p class="text-lg opacity-80 mb-12 px-6 font-medium">Programa de Bienestar Socioemocional</p>
+        
+        <button onclick="iniciarRegistro()" class="btn-naranja w-full max-w-sm text-white px-10 py-4 rounded-full font-bold text-xl uppercase">
+            COMENZAR
+        </button>
+        <p class="mt-16 text-xs opacity-50 font-bold uppercase tracking-widest">HDC 1991 - SISTEMA OPERATIVO</p>
+    </div>
+
+    <div id="registro" class="hidden w-full max-w-md bg-white text-[#0D2A47] rounded-3xl p-6 shadow-2xl border-t-8 border-[#EB7524]">
+        <h2 class="text-2xl font-bold mb-6 text-center border-b pb-2">Registro Ciudadano</h2>
+        <div class="space-y-4">
+            <input type="text" id="reg-nombre" placeholder="Nombre y Apellido" class="w-full border-2 border-gray-100 rounded-xl p-3 outline-none focus:border-[#EB7524] bg-gray-50">
+            <input type="text" id="reg-cedula" placeholder="Cédula de Identidad" class="w-full border-2 border-gray-100 rounded-xl p-3 outline-none focus:border-[#EB7524] bg-gray-50">
+            <input type="number" id="reg-edad" placeholder="Edad" oninput="actualizarCamposCondicionales()" class="w-full border-2 border-gray-100 rounded-xl p-3 outline-none focus:border-[#EB7524] bg-gray-50">
+            <div id="contenedor-condicional" class="w-full"></div>
+            <select id="reg-territorio" onchange="cargarSectores()" class="w-full border-2 border-gray-100 rounded-xl p-3 outline-none focus:border-[#EB7524] bg-gray-50">
+                <option value="">Seleccione Territorio...</option>
+                <option value="ARAGÜITA">ARAGÜITA</option>
+                <option value="CENTRO">CENTRO</option>
+                <option value="CIUDAD ALIANZA">CIUDAD ALIANZA</option>
+                <option value="SAMÁN">SAMÁN</option>
+                <option value="SUR">SUR</option>
+                <option value="TOCO">TOCO</option>
+                <option value="VIGIRIMA">VIGIRIMA</option>
+                <option value="YAGUA">YAGUA</option>
+            </select>
+            <select id="reg-sector" class="w-full border-2 border-gray-100 rounded-xl p-3 outline-none focus:border-[#EB7524] bg-gray-50" disabled>
+                <option value="">Primero elija territorio...</option>
+            </select>
+        </div>
+        <button onclick="empezarEncuesta()" class="btn-naranja mt-8 w-full text-white py-4 rounded-2xl font-bold text-lg">SIGUIENTE</button>
+    </div>
+
+    <div id="encuesta" class="hidden w-full max-w-lg rounded-3xl p-6 shadow-2xl text-white transition-colors duration-500">
+        <span id="nro-pregunta" class="text-xs font-bold opacity-70 uppercase tracking-widest">Pregunta 1</span>
+        <h3 id="texto-pregunta" class="text-2xl font-bold mt-2 mb-8 min-h-[60px] leading-snug">Cargando...</h3>
+        <div id="escala-respuestas" class="flex justify-between mb-8 px-2"></div>
+        <div class="flex justify-between px-2 text-[10px] font-bold opacity-80 uppercase mb-10">
+            <span>Nunca</span>
+            <span id="label-siempre">Siempre</span>
+        </div>
+
+        <div id="seccion-comentario" class="hidden mb-6">
+            <h4 class="font-bold mb-2 text-sm uppercase tracking-wide">Comentario Personal:</h4>
+            <textarea id="comentario-final" class="w-full bg-white/20 border-2 border-white/30 rounded-2xl p-4 h-32 outline-none focus:border-[#EB7524] text-white placeholder-white/50" placeholder="Escriba aquí su mensaje..."></textarea>
+        </div>
+
+        <div class="flex gap-2">
+            <button id="btn-anterior" onclick="preguntaAnterior()" class="hidden w-1/3 bg-white/10 py-3 rounded-xl font-bold hover:bg-white/20">ATRÁS</button>
+            <button id="btn-siguiente" onclick="proximaPregunta()" class="btn-naranja w-full text-white py-4 rounded-xl font-bold shadow-lg uppercase tracking-wider">SIGUIENTE</button>
+        </div>
+    </div>
+
+    <div id="gracias" class="hidden text-center p-8 flex flex-col items-center">
+        <div class="contenedor-logo" style="max-width: 250px;">
+            <img src="logo.jpg" alt="Logo Final" class="logo-especial">
+        </div>
+        <p class="text-2xl italic px-4 font-bold text-[#EB7524]">"Transformando Silencios en Esperanzas"</p>
+        <p class="mt-8 opacity-60 text-sm">Información procesada por HDC 1991</p>
+    </div>
+
+    <script>
+        const sectoresData = {
+            "ARAGÜITA": ["13 de Mayo", "19 de Julio", "Cacique de Guacara", "Dios Todopoderoso", "El Libertador", "El Milagro", "Ezequiel Zamora", "Guaicaipuro", "Guaicaipuro Bolivariano", "José Gregorio Guitián", "Juventud 1", "Juventud 2", "La Ceiba 2", "La Ceiba 2021", "La Floresta Sur", "La Franja", "Mocundo", "Nuestra Señora de la Coromoto", "Rafael Caldera", "Santa Bárbara 1", "Santa Bárbara 2", "Santa Eduviges", "Simón Bolívar Sur", "Tesoro del Indio Lote 2", "Tesoro del Indio Lote 3", "Tricentenario"],
+            "CENTRO": ["1ero de Mayo", "Casitas de Malavé Villalba", "El Cumbe", "El Placer", "La Coromoto", "La Florida", "La Goajira", "La Tigrera", "Las Casitas San Agustín", "Los Naranjillos", "Malavé Villalba 123", "Malavé Villalba 4567", "Mocundo Centro", "San Agustín", "Urb. Loma Linda"],
+            "CIUDAD ALIANZA": ["1era Etapa 1", "1ra Etapa 2", "2da Etapa", "3ra Etapa", "4F Alianza Gardens", "4ta Etapa A", "4ta Etapa B", "5ta Etapa", "Aguamarina", "Aguasal", "Brisa del Lago", "Conjunto Residencial Villa Alianza II", "José Laurencio Silva", "Prado del Lago", "Villa Alianza 1, Casas Dignas", "Villa Alianza Viviendas Dignas", "Villas del Lago y Río Verde"],
+            "SAMÁN": ["Apamates", "Bosques del Samán", "Ceiba del Samán", "El Prado", "Enmanuel", "Lagunas del Samán", "Los Girasoles del Samán", "Sector 1", "Sector 2", "Sector 3", "Sector 4", "Sector 5", "Sector 6", "Sector 7", "Sector 8", "Sector 9", "Sector 10", "Sector 11", "Sector 12", "Villas de Capreminfra"],
+            "SUR": ["Amazonia", "Banco Obrero", "Cristo Salva", "La Lucha", "Lago Jardín", "Libertad 1", "Libertad 2", "Macario Escorcha", "Nueva Guacara", "Turumo 1", "Turumo 2", "Villa Guacara"],
+            "TOCO": ["Cardonal 1", "Cardonal 2", "La Alegría", "La Emboscada", "La Floresta Norte", "Los Caobos", "Los Naranjos Norte", "Negro Primero", "Perrote 1", "Perrote 2", "Perrote 3", "Perrote 4", "San Rafael", "Simón Bolívar Norte", "Toco Norte", "Toquito La Milagrosa", "Urb. La Emboscada", "Urb. Las Brisas", "Valles de Naranjal", "Victoria de Guacara", "Villa Tarento"],
+            "VIGIRIMA": ["Avispero Norte", "Bolivariano I", "Bolivariano II", "Brisas del Mayei", "Cacho Mocho", "Colinas de Tronconero", "Colinas del Toco Ojo de Agua", "Diego Ibarra", "El Chaparral", "El Sisal", "Flor de la Manga", "La Compañía", "La Morita", "La Vecindad", "Mata Redonda", "Peñita Agrícola", "Peñita el Viento", "Petroglifos de Ojo de Agua", "Ramón Cruces", "Tronconero", "Tronconero Norte", "Tronconero Sur", "Valle Dorado", "Valles de Vigirima", "Vigirima Centro", "Villas del Toco"],
+            "YAGUA": ["Araguaney II A", "Araguaney II B", "Araguaney Primero", "Campo Amor", "El Cabrito", "El Limón", "El Naranjal", "El Porvenir", "La Manga", "La Milagrosa", "La Primavera", "Las Malvinas", "Las Mandarinas", "Los Almendrones", "Los Cedros", "Los Girasoles de Yagua", "Los Mangos", "Los Merecures", "Los Naranjos", "Maracaibero", "Quebrada Honda", "Samán Azucena", "San Esteban", "Valles de Yagua"]
+        };
+
+        const preguntasSets = {
+            jovenes_menores: ["¿Me siento triste sin saber por qué?", "¿Me enojo con facilidad?", "¿Me siento sin energía?", "¿Siento que nada me sale bien?", "¿Me siento excluido(a)?", "¿Evito hablar con mis compañeros?", "¿Me cuesta hacer amigos?", "¿Siento que no encajo?", "¿Me cuesta concentrarme?", "¿Mis notas han bajado?", "¿Me siento nervioso(a) en la escuela?", "¿En casa puedo hablar de mis problemas?", "¿Siento que mis emociones molestan?", "¿Me siento solo(a) incluso acompañado(a)?", "¿He tenido cambios en mis ganas de comer o dormir?"],
+            jovenes_mayores: ["¿Tengo cambios de ánimo fuertes?", "¿Me siento desconectado(a)?", "¿Ya no disfruto actividades?", "¿Me siento abrumado(a)?", "¿Prefiero estar solo(a)?", "¿Siento que no tengo a quién acudir?", "¿Me cuesta confiar en otros?", "¿He perdido interés en mis estudios?", "¿Me cuesta concentrarme?", "¿Me siento presionado(a)?", "¿Siento que en casa no me entienden?", "¿Evito hablar de mis emociones?", "¿Me siento tenso(a) en mi hogar?", "¿Me cuesta expresar lo que siento?", "¿Me irrito con facilidad?", "¿He cambiado mis hábitos de sueño o alimentación?"],
+            adulto: ["¿Presento cambios de ánimo drásticos o irritabilidad sin causa aparente?", "¿Me siento abrumado(a) por las responsabilidades diarias?", "¿He perdido el interés por actividades que antes disfrutaba?", "¿Me siento desconectado(a) de mis propias emociones o del entorno?", "¿Tiendo a aislarme y evitar el contacto con amigos o colegas?", "¿Siento que no cuento con una red de apoyo confiable en momentos críticos?", "¿Me cuesta confiar en las intenciones de los demás?", "¿Me cuesta concentrarme o tomar decisiones en mis tareas principales?", "¿Siento que mi productividad o rendimiento ha disminuido notablemente?", "¿Me siento bajo una presión constante que no logro gestionar?", "¿Siento que en mi entorno familiar no comprenden mi situación actual?", "¿Evito comunicar mis preocupaciones económicas o personales en casa?", "¿Percibo un ambiente de tensión o conflicto constante en mi hogar?", "¿Presento dificultades significativas para conciliar el sueño o cambios en mi apetito?", "¿Me cuesta controlar impulsos o reacciones de enojo?", "¿Siento una fatiga persistente o falta de energía vital?"]
+        };
+
+        let encuesta = { nombre: "", cedula: "", edad: 0, condicion: "", territorio: "", sector: "", respuestas: [], index: 0, preguntas: [] };
+
+        // RECUERDA CAMBIAR ESTO POR TU URL REAL DE GOOGLE
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwE-4l607hCRC4m3GT9jpRGPkpX-ZlqU_PYv3qRn2Z-G0a19n4QeqTcUXm_erQCZUbd/exec";
+
+        function iniciarRegistro() {
+            document.getElementById('splash').classList.add('hidden');
+            document.getElementById('registro').classList.remove('hidden');
+        }
+
+        function actualizarCamposCondicionales() {
+            const edad = parseInt(document.getElementById('reg-edad').value);
+            const contenedor = document.getElementById('contenedor-condicional');
+            if (edad >= 12 && edad <= 17) {
+                contenedor.innerHTML = `<select id="reg-condicion" class="w-full border-2 border-gray-100 rounded-xl p-3 outline-none focus:border-[#EB7524] bg-gray-50 text-[#0D2A47]">
+                    <option value="">¿Es estudiante?</option>
+                    <option value="Estudiante">Sí, estudio</option>
+                    <option value="No estudiante">No estudio</option>
+                </select>`;
+            } else if (edad >= 18) {
+                contenedor.innerHTML = `<input type="text" id="reg-condicion" placeholder="Profesión u Oficio" class="w-full border-2 border-gray-100 rounded-xl p-3 outline-none focus:border-[#EB7524] bg-gray-50 text-[#0D2A47]">`;
+            } else { contenedor.innerHTML = ""; }
+        }
+
+        function cargarSectores() {
+            const terr = document.getElementById('reg-territorio').value;
+            const combo = document.getElementById('reg-sector');
+            combo.innerHTML = '<option value="">Seleccione Sector...</option>';
+            if (sectoresData[terr]) {
+                sectoresData[terr].forEach(s => combo.innerHTML += `<option value="${s}">${s}</option>`);
+                combo.disabled = false;
+            } else { combo.disabled = true; }
+        }
+
+        function empezarEncuesta() {
+            encuesta.nombre = document.getElementById('reg-nombre').value.trim();
+            encuesta.cedula = document.getElementById('reg-cedula').value.trim();
+            encuesta.edad = parseInt(document.getElementById('reg-edad').value);
+            encuesta.territorio = document.getElementById('reg-territorio').value;
+            encuesta.sector = document.getElementById('reg-sector').value;
+            encuesta.condicion = document.getElementById('reg-condicion')?.value || "";
+
+            if (!encuesta.nombre || !encuesta.cedula || !encuesta.edad || !encuesta.sector || !encuesta.condicion) {
+                return alert("Complete todos los campos del registro.");
+            }
+
+            if (encuesta.edad <= 14) encuesta.preguntas = preguntasSets.jovenes_menores;
+            else if (encuesta.edad <= 17) encuesta.preguntas = preguntasSets.jovenes_mayores;
+            else encuesta.preguntas = preguntasSets.adulto;
+
+            document.getElementById('registro').classList.add('hidden');
+            document.getElementById('encuesta').classList.remove('hidden');
+            renderizarPregunta();
+        }
+
+        function renderizarPregunta() {
+            const index = encuesta.index;
+            const total = encuesta.preguntas.length;
+            const maxEscala = encuesta.edad < 15 ? 4 : 5;
+            const container = document.getElementById('encuesta');
+
+            container.className = `w-full max-w-lg rounded-3xl p-6 shadow-2xl transition-all duration-500 ${(index + 1) % 2 === 0 ? 'bg-pregunta-par' : 'bg-pregunta-impar'}`;
+            document.getElementById('nro-pregunta').innerText = `Pregunta ${index + 1} de ${total}`;
+            document.getElementById('texto-pregunta').innerText = encuesta.preguntas[index];
+            document.getElementById('label-siempre').innerText = `${maxEscala} Siempre`;
+
+            const escalaDiv = document.getElementById('escala-respuestas');
+            escalaDiv.innerHTML = '';
+            for (let i = 1; i <= maxEscala; i++) {
+                escalaDiv.innerHTML += `
+                    <div class="flex flex-col items-center">
+                        <input type="radio" name="p" id="r${i}" value="${i}" class="hidden radio-btn" ${encuesta.respuestas[index] == i ? 'checked' : ''}>
+                        <label for="r${i}" class="w-12 h-12 border-2 border-white/50 rounded-full flex items-center justify-center font-bold cursor-pointer hover:bg-white/20 shadow-lg">${i}</label>
+                    </div>`;
+            }
+            document.getElementById('btn-anterior').classList.toggle('hidden', index === 0);
+            const esUltima = index === total - 1;
+            document.getElementById('btn-siguiente').innerText = esUltima ? "ENVIAR" : "SIGUIENTE";
+            document.getElementById('seccion-comentario').classList.toggle('hidden', !esUltima);
+        }
+
+        function proximaPregunta() {
+            const seleccion = document.querySelector('input[name="p"]:checked');
+            if (!seleccion) return alert("Seleccione una opción.");
+            encuesta.respuestas[encuesta.index] = seleccion.value;
+
+            if (encuesta.index < encuesta.preguntas.length - 1) {
+                encuesta.index++;
+                renderizarPregunta();
+            } else {
+                if (!document.getElementById('comentario-final').value.trim()) return alert("El comentario personal es obligatorio.");
+                enviar();
+            }
+        }
+
+        function preguntaAnterior() {
+            if (encuesta.index > 0) { encuesta.index--; renderizarPregunta(); }
+        }
+
+        function enviar() {
+            const payload = {
+                nombre: encuesta.nombre,
+                cedula: encuesta.cedula,
+                edad: encuesta.edad,
+                condicion: encuesta.condicion,
+                territorio: encuesta.territorio,
+                sector: encuesta.sector,
+                respuestas: encuesta.respuestas,
+                comentario: document.getElementById('comentario-final').value.trim()
+            };
+
+            document.getElementById('encuesta').classList.add('hidden');
+            document.getElementById('gracias').classList.remove('hidden');
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(payload)
+            }).then(() => console.log("Datos enviados satisfactoriamente")).catch(err => console.error(err));
+        }
+    </script>
+</body>
+</html>
